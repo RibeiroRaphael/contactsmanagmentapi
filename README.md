@@ -12,7 +12,7 @@ Create, update, list, and delete contacts
 Basic data validation (email, phone, required fields)
 Filter contacts by region (DDD)
 Why this project
-This is a simple project by design. The goal is not complexity, but clarity — showing how I structure a small API, handle persistence and validations.
+This is a simple project by design. The goal is not complexity, but clarity.
 
 Running the project
 Clone the repository
