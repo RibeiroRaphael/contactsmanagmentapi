@@ -34,12 +34,12 @@ namespace Contactsmanagment.Repositories
 
         public async Task<Contact?> GetByIdAsync(Guid id)
         {
-            return await _context.Contacts.FirstOrDefaultAsync(c => c.Id == id);
+            return await _context.Contacts.Include(c=>c.Region).FirstOrDefaultAsync(c => c.Id == id);
         }
 
         public async Task<IEnumerable<Contact>> GetAllAsync()
         {
-            return await _context.Contacts.AsNoTracking().ToListAsync();
+            return await _context.Contacts.Include(c => c.Region).ToListAsync();
         }
 
         public async Task<bool> ExistsByEmailAsync(string email)

@@ -1,6 +1,6 @@
 ﻿using Contactsmanagment.Models;
-using Contactsmanagment.Models.Dtos;
-using Contactsmanagment.Services;
+using Contactsmanagment.Models.Dtos.Contacts;
+using Contactsmanagment.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Contactsmanagment.Controllers
@@ -17,7 +17,7 @@ namespace Contactsmanagment.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Contact contact)
+        public async Task<IActionResult> Create(CreateContactDto contact)
         {
             var result = await _service.Create(contact);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);

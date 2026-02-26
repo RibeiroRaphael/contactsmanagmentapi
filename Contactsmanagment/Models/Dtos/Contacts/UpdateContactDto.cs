@@ -1,4 +1,4 @@
-﻿namespace Contactsmanagment.Models.Dtos
+﻿namespace Contactsmanagment.Models.Dtos.Contacts
 {
     public class UpdateContactDto
     {

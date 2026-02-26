@@ -1,8 +1,10 @@
 ﻿using Contactsmanagment.Data;
 using Contactsmanagment.Models;
-using Contactsmanagment.Models.Dtos;
+using Contactsmanagment.Models.Dtos.Contacts;
 using Contactsmanagment.Repositories;
 using Contactsmanagment.Repositories.Interfaces;
+using Contactsmanagment.Services.Interfaces;
+using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 
 namespace Contactsmanagment.Services
@@ -17,20 +19,65 @@ namespace Contactsmanagment.Services
             _context = context;
         }
 
-        public async Task<Contact> Create(Contact contact)
+        private static ContactResponseDto Map(Contact contact)
         {
+            return new ContactResponseDto()
+            {
+                Id = contact.Id,
+                Name = contact.Name,
+                Email = contact.Email,
+                Phone = contact.Phone,
+                Ddd = contact.Region.Ddd,
+                RegionName = contact.Region.Name
+            };
+        }
+
+        public async Task<ContactResponseDto> Create(CreateContactDto contactDto)
+        {
+            var region = await _context.Regions.FirstOrDefaultAsync(r => r.Id == contactDto.RegionId);
+
+            if(region is null)
+            {
+                throw new Exception("Region não encontrada");
+            }
+
+            if(!region.IsActive)
+            {
+                throw new Exception("Região inativa");
+            }
+            
+            var existsEmail = await _contactRepository.ExistsByEmailAsync(contactDto.Email);
+            if(existsEmail)
+            {
+                throw new Exception("Email já existe");
+            }
+
+            var contact = new Contact
+            {
+                Id = Guid.NewGuid(),
+                Name = contactDto.Name,
+                Email = contactDto.Email,
+                Phone = contactDto.Phone,
+                RegionId = contactDto.RegionId
+            
+            };
+
             await _contactRepository.AddAsync(contact);
-            return contact;
+            contact.Region = region;
+
+            return Map(contact);
         }
 
-        public async Task<IEnumerable<Contact>> GetAll()
+        public async Task<IEnumerable<ContactResponseDto>> GetAll()
         {
-            return await _contactRepository.GetAllAsync();
+            var contacts =  await _contactRepository.GetAllAsync();
+            return contacts.Select(Map);
         }
 
-        public async Task<Contact?> GetById(Guid id)
+        public async Task<ContactResponseDto?> GetById(Guid id)
         {
-            return await _contactRepository.GetByIdAsync(id);
+            var contact = await _contactRepository.GetByIdAsync(id);
+            return Map(contact);
         }
 
         public async Task Update(Guid id, UpdateContactDto dto)
@@ -40,7 +87,6 @@ namespace Contactsmanagment.Services
             if (contact is null)
                 throw new Exception("Contact not found");
 
-            // Verificar email duplicado (se mudou)
             if (contact.Email != dto.Email)
             {
                 var emailExists = await _contactRepository.ExistsByEmailAsync(dto.Email);

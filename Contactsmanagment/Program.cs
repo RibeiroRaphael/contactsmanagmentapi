@@ -2,6 +2,7 @@ using Contactsmanagment.Data;
 using Contactsmanagment.Repositories;
 using Contactsmanagment.Repositories.Interfaces;
 using Contactsmanagment.Services;
+using Contactsmanagment.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
