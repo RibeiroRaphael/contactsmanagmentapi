@@ -34,7 +34,7 @@ namespace Contactsmanagment.Services
 
         public async Task<ContactResponseDto> Create(CreateContactDto contactDto)
         {
-            var region = await _context.Regions.FirstOrDefaultAsync(r => r.Id == contactDto.RegionId);
+            var region = await _context.Regions.FirstOrDefaultAsync(r => r.Ddd == contactDto.Ddd);
 
             if(region is null)
             {
@@ -58,7 +58,7 @@ namespace Contactsmanagment.Services
                 Name = contactDto.Name,
                 Email = contactDto.Email,
                 Phone = contactDto.Phone,
-                RegionId = contactDto.RegionId
+                RegionId = region.Id
             
             };
 
@@ -95,7 +95,7 @@ namespace Contactsmanagment.Services
                     throw new Exception("Email already exists");
             }
 
-            var region = await _context.Regions.FirstOrDefaultAsync(r => r.Id == dto.RegionId); 
+            var region = await _context.Regions.FirstOrDefaultAsync(r => r.Ddd == dto.Ddd); 
             
             if (region is null)
                 throw new Exception("Region not found");
@@ -107,7 +107,7 @@ namespace Contactsmanagment.Services
             contact.Name = dto.Name;
             contact.Email = dto.Email;
             contact.Phone = dto.Phone;
-            contact.RegionId = dto.RegionId;
+            contact.RegionId =region.Id;
 
             await _contactRepository.UpdateAsync(contact);
         }
