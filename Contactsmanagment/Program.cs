@@ -3,6 +3,7 @@ using Contactsmanagment.Repositories;
 using Contactsmanagment.Repositories.Interfaces;
 using Contactsmanagment.Services;
 using Contactsmanagment.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +23,26 @@ builder.Services.AddScoped<IContactService, ContactService>();
 
 //repositories
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(e => e.Value.Errors.Count > 0)
+            .Select(e => new
+            {
+                Field = e.Key,
+                Errors = e.Value.Errors.Select(x => x.ErrorMessage)
+            });
+
+        return new BadRequestObjectResult(new
+        {
+            Message = "Validation failed",
+            Errors = errors
+        });
+    };
+});
 
 
 var app = builder.Build();
